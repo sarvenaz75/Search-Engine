@@ -1,0 +1,53 @@
+pip install gensim
+
+import gensim
+from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+from nltk.tokenize import word_tokenize
+from gensim.models.doc2vec import Doc2Vec
+import time
+
+
+with open("C:/Users/Sarve/dblp1.txt", "r") as f:
+        data = f.readlines()
+        
+        
+tagged_data = [TaggedDocument(words=word_tokenize(_d.lower()), tags=[str(i)]) for i, _d in enumerate(data)]
+
+print (tagged_data)
+
+
+start_time = time.time()
+
+model = gensim.models.doc2vec.Doc2Vec(vector_size=30, min_count=5, epochs=80)
+
+model.build_vocab(tagged_data)
+
+model.train(tagged_data, total_examples=model.corpus_count, epochs=80)
+
+print("--- %s seconds ---" % (time.time() - start_time))
+
+model.save("d2v.model")
+
+model = Doc2Vec.load("d2v.model")
+
+
+test_data = word_tokenize("an theory an of structural stationarity in the i pi i calculus, theory in".lower())
+v1 = model.infer_vector(test_data)
+print("V1_infer", v1)
+
+
+similar_doc = model.docvecs.most_similar('0')
+#print(similar_doc)
+
+print(data[0])
+
+#if(data[0] == 'Parallel Integer Sorting and Simulation Amongst CRCW Models \n'):
+    #print('yes')
+
+for i,j in similar_doc:
+    print(data[int(i)] + " " + "similarity : " , j , "\n")
+    
+
+print("--- %s seconds ---" % (time.time() - start_time))
+
+
